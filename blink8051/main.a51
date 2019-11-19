@@ -31,15 +31,15 @@
 	ie2 data 0afh
 	t2h data 0d6h
 	t2l data 0d7h
-	
 	pwmcnt equ 10000h	; Duty range: 65535 downto 0
-	pwmdutyh equ 20000d
-	pwmdutyl equ (pwmcnt-pwmdutyh)
-
-	rotcnt equ 7000d	; Encoder count interrupt interval 50Hz
+	rotcnt equ 1c23h	; Encoder count interrupt interval 50Hz
 
 ;; Variables
 	pwmflag bit 20h.0
+	pwmdutyh_h equ 031h
+	pwmdutyh_l equ 030h
+	pwmdutyl_h equ 033h
+	pwmdutyl_l equ 032h
 
 ;; Onboard peripherals
 	dac bit p1.4
@@ -71,15 +71,15 @@ reset:
 	mov p5m1, #00000000b
 
 	;; Comparator initialise
-	mov cmpcr1, #11100100b	; cmpen, cmpif, pie, nie, pis, nis, cmpoe, cmpres(ro)
+	mov cmpcr1, #11110100b	; cmpen, cmpif, pie, nie, pis, nis, cmpoe, cmpres(ro)
 	mov cmpcr2, #00001000b	; invcmpo, disfit, lcdty(5 downto 0)
 
 	;; Timer (PWM) initialise
 	orl auxr, #10000000b	; Timer 0 1T mode
 	mov intclko, #00000001b	; Timer 0 clock output enable
 	anl tmod, #11110000b	; Timer 0 mode 0
-	mov tl0, #low (10000h - pwmdutyl)
-	mov th0, #high (10000h - pwmdutyl)
+	mov tl0, #00001000b
+	mov th0, #00001000b
 	setb dac
 	clr pwmflag
 	setb tr0		; Timer 0 start
@@ -100,45 +100,48 @@ reset:
 	clr rs1
 	
 loop:
-	mov a, r1		; Timer 2 50Hz counter
-	cjne r1, #5d, restart	; Count to 0.1s
-	mov r1, #0d
+	cjne r1, #5d, loop
+	mov r1, #0d		; Reset interval counter
+count:
 	cpl led
-	nop			; Count RPM here
-	mov r0, #0d
+	inc r0
+	mov pwmdutyh_h, r0
+	mov pwmdutyh_l, #0d
+
+	mov a, #0ffh		; inv16 algorithm: subtract 0ffh by pwmdutyh
+	clr c
+	subb a, #0d
+	mov pwmdutyl_l, a
+	mov a, #0ffh
+	subb a, r0
+	mov pwmdutyl_h, a 
+	mov r0, #0d		; Reset pulse counter
+	
 restart:
 	sjmp loop
-
+	
 cmp_isr:
-	push acc
 	anl cmpcr1, #not cmpif
-	mov a, r0
-	add a, #1b
-	mov r0, a
-	pop acc
+	inc r0
 	reti
 
 t0_isr:
 	cpl pwmflag
 	jnb pwmflag, rdylow
 rdyhigh:
-	mov tl0, #low (10000h - pwmdutyh)
-	mov th0, #high (10000h - pwmdutyh)
+	mov tl0, pwmdutyl_l
+	mov th0, pwmdutyl_h
 	jmp t0_isrret
 rdylow:
-	mov tl0, #low (10000h - pwmdutyl)
-	mov th0, #high (10000h - pwmdutyl)
+	mov tl0, pwmdutyh_l
+	mov th0, pwmdutyh_h
 t0_isrret:
 	reti
 
 t2_isr:
-	push acc
-	mov a, r1
-	add a, #1b
-	mov r1, a
+	inc r1
 	anl ie2, #11111011b	; Re-enable interrupt
 	orl ie2, #00000100b
-	pop acc
 	reti
 	
 end
