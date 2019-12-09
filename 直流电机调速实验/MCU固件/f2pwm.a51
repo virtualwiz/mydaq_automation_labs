@@ -63,7 +63,7 @@ reset:
 	mov sp, #60h
 	
 	;; GPIO initialise
-	mov p1m0, #00010001b	; DAC, LED PP mode
+	mov p1m0, #00010101b	; DAC, LED, CMP PP mode
 	mov p1m1, #00000000b
 	mov p3m0, #00000000b
 	mov p3m1, #00000000b
@@ -71,7 +71,7 @@ reset:
 	mov p5m1, #00000000b
 
 	;; Comparator initialise
-	mov cmpcr1, #11110100b	; cmpen, cmpif, pie, nie, pis, nis, cmpoe, cmpres(ro)
+	mov cmpcr1, #11110110b	; cmpen, cmpif, pie, nie, pis, nis, cmpoe, cmpres(ro)
 	mov cmpcr2, #00001000b	; invcmpo, disfit, lcdty(5 downto 0)
 
 	;; Timer (PWM) initialise
