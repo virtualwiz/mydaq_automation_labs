@@ -1,0 +1,61 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{xeCJK}
+\usepackage{geometry}
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+\usepackage{graphicx}
+\usepackage{float}
+
+\setmainfont{CMU Serif}
+\setsansfont{CMU Serif}
+\setmonofont{CMU Typewriter Text}
+
+\setCJKmainfont{SimSun}
+\setCJKsansfont{SimSun}
+\setCJKmonofont{SimSun}
+
+\usepackage{datetime}
+\renewcommand{\today}{\number\year 年 \number\month 月 \number\day 日}
+%\renewcommand{\abstractname}{}
+%\renewcommand{\contentsname}{}
+
+\title{``基于NI myDAQ的自动控制原理实验套件''设计说明}
+
+
+\begin{document}
+\author{电气信息学院 \ 自动控制原理实验室}
+
+\maketitle
+
+\begin{abstract}
+  本项目以MATLAB/Simulink为实验环境，将National Instruments公司出品的myDAQ可编程测量设备作为模拟/数字接口，使计算机与外部硬件交互，进而设计了用于自动控制原理教学实验的三套实验设备。每个实验所需的硬件以一块板卡的形式与myDAQ连接，并可与MATLAB中的程序交互。通过更换板卡，学生可选择进行不同的实验。
+\end{abstract}
+
+\tableofcontents
+
+\section{NI myDAQ 接线端子适配器}
+
+\subsection{设计目的}
+NI myDAQ可编程测量设备的右侧带有20个螺丝接线端子，原本被设计用于接入单根导线。考虑到项目中的实验板卡需要经常插拔，
+
+
+\subsection{硬件选型与设计}
+
+\subsection{原理图}
+
+\section{模拟电路比例-积分-微分控制器}
+
+\subsection{设计目的}
+
+\section{直流电机调速实验}
+
+\subsection{设计目的}
+
+\section{温度控制实验}
+
+\subsection{设计目的}
+
+
+\end{document}
